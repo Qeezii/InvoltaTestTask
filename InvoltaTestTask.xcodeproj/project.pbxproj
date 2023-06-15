@@ -11,6 +11,11 @@
 		9CA943442A3AD3DB00C39828 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CA943432A3AD3DB00C39828 /* ViewController.swift */; };
 		9CA943492A3AD3DD00C39828 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9CA943482A3AD3DD00C39828 /* Assets.xcassets */; };
 		9CA9434C2A3AD3DD00C39828 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9CA9434A2A3AD3DD00C39828 /* LaunchScreen.storyboard */; };
+		9CA9435A2A3AD8F600C39828 /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CA943592A3AD8F600C39828 /* API.swift */; };
+		9CA9435C2A3AD96A00C39828 /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CA9435B2A3AD96A00C39828 /* AppConstants.swift */; };
+		9CA9435E2A3ADF2600C39828 /* MessageResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CA9435D2A3ADF2600C39828 /* MessageResponse.swift */; };
+		9CA943602A3ADFBF00C39828 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CA9435F2A3ADFBF00C39828 /* NetworkManager.swift */; };
+		9CA943622A3AE19800C39828 /* NetworkError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CA943612A3AE19800C39828 /* NetworkError.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -20,6 +25,11 @@
 		9CA943482A3AD3DD00C39828 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9CA9434B2A3AD3DD00C39828 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		9CA9434D2A3AD3DD00C39828 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9CA943592A3AD8F600C39828 /* API.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = API.swift; sourceTree = "<group>"; };
+		9CA9435B2A3AD96A00C39828 /* AppConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConstants.swift; sourceTree = "<group>"; };
+		9CA9435D2A3ADF2600C39828 /* MessageResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageResponse.swift; sourceTree = "<group>"; };
+		9CA9435F2A3ADFBF00C39828 /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
+		9CA943612A3AE19800C39828 /* NetworkError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkError.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,6 +83,7 @@
 		9CA943542A3AD68A00C39828 /* Service */ = {
 			isa = PBXGroup;
 			children = (
+				9CA943582A3AD8E600C39828 /* Network */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -88,6 +99,7 @@
 		9CA943562A3AD6A500C39828 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				9CA9435D2A3ADF2600C39828 /* MessageResponse.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -95,10 +107,21 @@
 		9CA943572A3AD6B800C39828 /* Support */ = {
 			isa = PBXGroup;
 			children = (
+				9CA9435B2A3AD96A00C39828 /* AppConstants.swift */,
 				9CA943482A3AD3DD00C39828 /* Assets.xcassets */,
 				9CA9434A2A3AD3DD00C39828 /* LaunchScreen.storyboard */,
 			);
 			path = Support;
+			sourceTree = "<group>";
+		};
+		9CA943582A3AD8E600C39828 /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				9CA943592A3AD8F600C39828 /* API.swift */,
+				9CA9435F2A3ADFBF00C39828 /* NetworkManager.swift */,
+				9CA943612A3AE19800C39828 /* NetworkError.swift */,
+			);
+			path = Network;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -171,8 +194,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9CA943602A3ADFBF00C39828 /* NetworkManager.swift in Sources */,
+				9CA943622A3AE19800C39828 /* NetworkError.swift in Sources */,
+				9CA9435E2A3ADF2600C39828 /* MessageResponse.swift in Sources */,
 				9CA943442A3AD3DB00C39828 /* ViewController.swift in Sources */,
+				9CA9435A2A3AD8F600C39828 /* API.swift in Sources */,
 				9CA943402A3AD3DB00C39828 /* AppDelegate.swift in Sources */,
+				9CA9435C2A3AD96A00C39828 /* AppConstants.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
