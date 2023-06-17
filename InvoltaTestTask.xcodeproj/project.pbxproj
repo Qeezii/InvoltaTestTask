@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		9CA943402A3AD3DB00C39828 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CA9433F2A3AD3DB00C39828 /* AppDelegate.swift */; };
-		9CA943442A3AD3DB00C39828 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CA943432A3AD3DB00C39828 /* ViewController.swift */; };
+		9CA943442A3AD3DB00C39828 /* MessagesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CA943432A3AD3DB00C39828 /* MessagesViewController.swift */; };
 		9CA943492A3AD3DD00C39828 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9CA943482A3AD3DD00C39828 /* Assets.xcassets */; };
 		9CA9434C2A3AD3DD00C39828 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9CA9434A2A3AD3DD00C39828 /* LaunchScreen.storyboard */; };
 		9CA9435A2A3AD8F600C39828 /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CA943592A3AD8F600C39828 /* API.swift */; };
@@ -16,12 +16,13 @@
 		9CA9435E2A3ADF2600C39828 /* MessageResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CA9435D2A3ADF2600C39828 /* MessageResponse.swift */; };
 		9CA943602A3ADFBF00C39828 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CA9435F2A3ADFBF00C39828 /* NetworkManager.swift */; };
 		9CA943622A3AE19800C39828 /* NetworkError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CA943612A3AE19800C39828 /* NetworkError.swift */; };
+		9CA943642A3C9C8800C39828 /* MessagesTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CA943632A3C9C8800C39828 /* MessagesTableViewCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		9CA9433C2A3AD3DB00C39828 /* InvoltaTestTask.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InvoltaTestTask.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9CA9433F2A3AD3DB00C39828 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		9CA943432A3AD3DB00C39828 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		9CA943432A3AD3DB00C39828 /* MessagesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesViewController.swift; sourceTree = "<group>"; };
 		9CA943482A3AD3DD00C39828 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9CA9434B2A3AD3DD00C39828 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		9CA9434D2A3AD3DD00C39828 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -30,6 +31,7 @@
 		9CA9435D2A3ADF2600C39828 /* MessageResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageResponse.swift; sourceTree = "<group>"; };
 		9CA9435F2A3ADFBF00C39828 /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
 		9CA943612A3AE19800C39828 /* NetworkError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkError.swift; sourceTree = "<group>"; };
+		9CA943632A3C9C8800C39828 /* MessagesTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesTableViewCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,7 +93,7 @@
 		9CA943552A3AD69200C39828 /* Modules */ = {
 			isa = PBXGroup;
 			children = (
-				9CA943432A3AD3DB00C39828 /* ViewController.swift */,
+				9CA943652A3CB67000C39828 /* Chat */,
 			);
 			path = Modules;
 			sourceTree = "<group>";
@@ -122,6 +124,15 @@
 				9CA943612A3AE19800C39828 /* NetworkError.swift */,
 			);
 			path = Network;
+			sourceTree = "<group>";
+		};
+		9CA943652A3CB67000C39828 /* Chat */ = {
+			isa = PBXGroup;
+			children = (
+				9CA943432A3AD3DB00C39828 /* MessagesViewController.swift */,
+				9CA943632A3C9C8800C39828 /* MessagesTableViewCell.swift */,
+			);
+			path = Chat;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -195,9 +206,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				9CA943602A3ADFBF00C39828 /* NetworkManager.swift in Sources */,
+				9CA943642A3C9C8800C39828 /* MessagesTableViewCell.swift in Sources */,
 				9CA943622A3AE19800C39828 /* NetworkError.swift in Sources */,
 				9CA9435E2A3ADF2600C39828 /* MessageResponse.swift in Sources */,
-				9CA943442A3AD3DB00C39828 /* ViewController.swift in Sources */,
+				9CA943442A3AD3DB00C39828 /* MessagesViewController.swift in Sources */,
 				9CA9435A2A3AD8F600C39828 /* API.swift in Sources */,
 				9CA943402A3AD3DB00C39828 /* AppDelegate.swift in Sources */,
 				9CA9435C2A3AD96A00C39828 /* AppConstants.swift in Sources */,

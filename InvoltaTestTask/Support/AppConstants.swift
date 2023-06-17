@@ -18,5 +18,27 @@ struct AppConstants {
                 static let offsetQueryItem = "offset"
             }
         }
+
+        struct MessagesScreen {
+            static let cellIdentifier = "MessagesTableViewCell"
+        }
+    }
+
+    struct Constraints {
+        static let topSpacingLarge: CGFloat = 24
+        static let topSpacingMiddle: CGFloat = 16
+        static let topSpacingSmall: CGFloat = 8
+
+        static let leadingLarge: CGFloat = 24
+        static let leadingMiddle: CGFloat = 16
+        static let leadingSmall: CGFloat = 8
+
+        static let trailingLarge: CGFloat = -24
+        static let trailingMiddle: CGFloat = -16
+        static let trailingSmall: CGFloat = -8
+
+        static let bottomSpacingLarge: CGFloat = -24
+        static let bottomSpacingMiddle: CGFloat = -16
+        static let bottomSpacingSmall: CGFloat = -8
     }
 }
