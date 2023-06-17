@@ -12,6 +12,8 @@ class MessagesViewController: UIViewController {
     // MARK: - Properties
     private var offset: Int = 0
     private var messages: [String] = []
+    private var isLoading: Bool = false
+    private var failedLoadCounter: Int = 0
 
     // MARK: - UI Elements
     private let messagesTableView: UITableView = {
@@ -24,6 +26,12 @@ class MessagesViewController: UIViewController {
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.transform = CGAffineTransform(scaleX: 1, y: -1)
         return tableView
+    }()
+    private let spinnerActivityIndicatorView: UIActivityIndicatorView = {
+        let activityIndicator = UIActivityIndicatorView()
+        activityIndicator.style = .medium
+        activityIndicator.startAnimating()
+        return activityIndicator
     }()
 
     // MARK: - Override funcs
@@ -40,6 +48,9 @@ class MessagesViewController: UIViewController {
         messagesTableView.delegate = self
         messagesTableView.register(MessagesTableViewCell.self,
                                    forCellReuseIdentifier: AppConstants.Strings.MessagesScreen.cellIdentifier)
+        messagesTableView.tableFooterView = spinnerActivityIndicatorView
+        messagesTableView.tableFooterView?.isHidden = true
+        spinnerActivityIndicatorView.frame = CGRect(x: 0, y: 0, width: messagesTableView.bounds.width, height: 44)
 
         view.addSubview(messagesTableView)
         messagesTableView.topAnchor.constraint(
@@ -52,18 +63,41 @@ class MessagesViewController: UIViewController {
             constant: AppConstants.Constraints.bottomSpacingMiddle).isActive = true
     }
     private func getMessage() {
+        guard !isLoading,
+              failedLoadCounter < 3 else { return }
+        if !messages.isEmpty {
+            showSpinner(true)
+        }
+        isLoading.toggle()
         NetworkManager.shared.fetchData(offset: offset) { [weak self] (result: Result<MessageResponse, Error>) in
             guard let self else { return }
             switch result {
             case .success(let messageResponse):
-                DispatchQueue.main.async {
-                    self.messages += messageResponse.result
-                    self.offset += messageResponse.result.count
-                    self.messagesTableView.reloadData()
-                }
+                showSpinner(false)
+                guard !messageResponse.result.isEmpty else { return }
+                loadSuccess(messages: messageResponse.result)
             case .failure(let failure):
                 print(failure.localizedDescription)
+                failedLoadCounter += 1
+                isLoading.toggle()
+                showSpinner(false)
+                guard failedLoadCounter < 3 else { return }
+                getMessage()
             }
+        }
+    }
+    private func loadSuccess(messages: [String]) {
+        DispatchQueue.main.async {
+            self.messages += messages
+            self.offset += messages.count
+            self.isLoading.toggle()
+            self.failedLoadCounter = 0
+            self.messagesTableView.reloadData()
+        }
+    }
+    private func showSpinner(_ mode: Bool) {
+        DispatchQueue.main.async {
+            self.messagesTableView.tableFooterView?.isHidden = mode ? false : true
         }
     }
 }
@@ -88,5 +122,10 @@ extension MessagesViewController: UITableViewDataSource {
 extension MessagesViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 
+    }
+
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        guard indexPath.row == messages.count - 1 else { return }
+        getMessage()
     }
 }
