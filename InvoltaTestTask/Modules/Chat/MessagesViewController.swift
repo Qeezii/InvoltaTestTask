@@ -7,7 +7,7 @@
 
 import UIKit
 
-class MessagesViewController: UIViewController {
+final class MessagesViewController: UIViewController {
 
     // MARK: - Properties
     private var offset: Int = 0
@@ -16,6 +16,14 @@ class MessagesViewController: UIViewController {
     private var failedLoadCounter: Int = 0
 
     // MARK: - UI Elements
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.text = AppConstants.Strings.MessagesScreen.titleLabelText
+        label.textColor = .label
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
     private let messagesTableView: UITableView = {
         let tableView = UITableView()
         tableView.backgroundColor = .systemBackground
@@ -37,12 +45,25 @@ class MessagesViewController: UIViewController {
     // MARK: - Override funcs
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
         getMessage()
-        configureMessagesTableView()
+        configureUIElements()
     }
 
     // MARK: - Methods
+    private func configureUIElements() {
+        configureMainView()
+        configureTitleLabel()
+        configureMessagesTableView()
+    }
+    private func configureMainView() {
+        view.backgroundColor = .systemBackground
+    }
+    private func configureTitleLabel() {
+        view.addSubview(titleLabel)
+        titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: AppConstants.Constraints.topSpacingSmall).isActive = true
+        titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+    }
     private func configureMessagesTableView() {
         messagesTableView.dataSource = self
         messagesTableView.delegate = self
@@ -54,7 +75,7 @@ class MessagesViewController: UIViewController {
 
         view.addSubview(messagesTableView)
         messagesTableView.topAnchor.constraint(
-            equalTo: view.safeAreaLayoutGuide.topAnchor,
+            equalTo: titleLabel.bottomAnchor,
             constant: AppConstants.Constraints.topSpacingMiddle).isActive = true
         messagesTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         messagesTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true

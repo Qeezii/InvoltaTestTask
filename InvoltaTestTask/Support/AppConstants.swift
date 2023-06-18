@@ -20,6 +20,7 @@ struct AppConstants {
         }
 
         struct MessagesScreen {
+            static let titleLabelText = "Тестовое задание"
             static let cellIdentifier = "MessagesTableViewCell"
         }
     }
