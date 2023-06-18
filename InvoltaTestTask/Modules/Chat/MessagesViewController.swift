@@ -41,6 +41,42 @@ final class MessagesViewController: UIViewController {
         activityIndicator.startAnimating()
         return activityIndicator
     }()
+    private let enterMessageView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .secondarySystemFill
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    private let enterMessageTextField: UITextField = {
+        let textField = UITextField()
+        textField.placeholder = AppConstants.Strings.MessagesScreen.enterMessageTextFieldPlaceholder
+        textField.backgroundColor = .systemBackground
+        textField.textColor = .label
+        textField.layer.cornerRadius = 10
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        let leftView = UIView(frame: CGRect(x: 10, y: 0, width: 7, height: textField.bounds.height))
+        leftView.backgroundColor = .clear
+        textField.leftView = leftView
+        textField.leftViewMode = .always
+        textField.contentVerticalAlignment = .center
+        return textField
+    }()
+    private let enterMessageButton: UIButton = {
+        let button = UIButton()
+        button.setImage(UIImage(systemName: AppConstants.Strings.MessagesScreen.enterMessageButtonImage),
+                        for: .normal)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+
+    // MARK: - UIRecognizers
+    private lazy var swipeDownRecognizer: UISwipeGestureRecognizer = {
+        let recognizer = UISwipeGestureRecognizer()
+        recognizer.addTarget(self, action: #selector(hideKeyboard))
+        recognizer.delegate = self
+        recognizer.direction = UISwipeGestureRecognizer.Direction.up
+        return recognizer
+    }()
 
     // MARK: - Override funcs
     override func viewDidLoad() {
@@ -53,6 +89,9 @@ final class MessagesViewController: UIViewController {
     private func configureUIElements() {
         configureMainView()
         configureTitleLabel()
+        configureEnterMessageView()
+        configureEnterMessageButton()
+        configureEnterMessageTextField()
         configureMessagesTableView()
     }
     private func configureMainView() {
@@ -60,9 +99,35 @@ final class MessagesViewController: UIViewController {
     }
     private func configureTitleLabel() {
         view.addSubview(titleLabel)
-        titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: AppConstants.Constraints.topSpacingSmall).isActive = true
+        titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
         titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        titleLabel.heightAnchor.constraint(equalToConstant: 44).isActive = true
+    }
+    private func configureEnterMessageView() {
+        view.addSubview(enterMessageView)
+        enterMessageView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        enterMessageView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        enterMessageView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
+        enterMessageView.heightAnchor.constraint(equalToConstant: 44).isActive = true
+    }
+    private func configureEnterMessageButton() {
+        enterMessageView.addSubview(enterMessageButton)
+        enterMessageButton.topAnchor.constraint(equalTo: enterMessageView.topAnchor).isActive = true
+        enterMessageButton.trailingAnchor.constraint(equalTo: enterMessageView.trailingAnchor,
+                                                     constant: AppConstants.Constraints.trailingSmall).isActive = true
+        enterMessageButton.bottomAnchor.constraint(equalTo: enterMessageView.bottomAnchor).isActive = true
+        enterMessageButton.widthAnchor.constraint(equalToConstant: 24).isActive = true
+    }
+    private func configureEnterMessageTextField() {
+        enterMessageTextField.delegate = self
+        enterMessageView.addSubview(enterMessageTextField)
+        enterMessageTextField.topAnchor.constraint(equalTo: enterMessageView.topAnchor, constant: AppConstants.Constraints.topSpacingSmall).isActive = true
+        enterMessageTextField.leadingAnchor.constraint(equalTo: enterMessageView.leadingAnchor,
+                                                       constant: AppConstants.Constraints.leadingSmall).isActive = true
+        enterMessageTextField.trailingAnchor.constraint(equalTo: enterMessageButton.leadingAnchor,
+                                                        constant: AppConstants.Constraints.trailingSmall).isActive = true
+        enterMessageTextField.bottomAnchor.constraint(equalTo: enterMessageView.bottomAnchor, constant: AppConstants.Constraints.bottomSpacingSmall).isActive = true
     }
     private func configureMessagesTableView() {
         messagesTableView.dataSource = self
@@ -72,16 +137,13 @@ final class MessagesViewController: UIViewController {
         messagesTableView.tableFooterView = spinnerActivityIndicatorView
         messagesTableView.tableFooterView?.isHidden = true
         spinnerActivityIndicatorView.frame = CGRect(x: 0, y: 0, width: messagesTableView.bounds.width, height: 44)
+        messagesTableView.addGestureRecognizer(swipeDownRecognizer)
 
         view.addSubview(messagesTableView)
-        messagesTableView.topAnchor.constraint(
-            equalTo: titleLabel.bottomAnchor,
-            constant: AppConstants.Constraints.topSpacingMiddle).isActive = true
+        messagesTableView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor).isActive = true
         messagesTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         messagesTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        messagesTableView.bottomAnchor.constraint(
-            equalTo: view.safeAreaLayoutGuide.bottomAnchor,
-            constant: AppConstants.Constraints.bottomSpacingMiddle).isActive = true
+        messagesTableView.bottomAnchor.constraint(equalTo: enterMessageView.topAnchor).isActive = true
     }
     private func getMessage() {
         guard !isLoading,
@@ -121,6 +183,9 @@ final class MessagesViewController: UIViewController {
             self.messagesTableView.tableFooterView?.isHidden = mode ? false : true
         }
     }
+    @objc private func hideKeyboard() {
+        enterMessageTextField.endEditing(true)
+    }
 }
 
 // MARK: - Extensions
@@ -138,7 +203,6 @@ extension MessagesViewController: UITableViewDataSource {
         return cell
     }
 }
-
 // MARK: - UITableViewDelegate
 extension MessagesViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -148,5 +212,18 @@ extension MessagesViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         guard indexPath.row == messages.count - 1 else { return }
         getMessage()
+    }
+}
+// MARK: - UITextFieldDelegate
+extension MessagesViewController: UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        hideKeyboard()
+        return true
+    }
+}
+// MARK: - UIGestureRecognizerDelegate
+extension MessagesViewController: UIGestureRecognizerDelegate {
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        true
     }
 }

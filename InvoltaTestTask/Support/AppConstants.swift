@@ -21,7 +21,9 @@ struct AppConstants {
 
         struct MessagesScreen {
             static let titleLabelText = "Тестовое задание"
+            static let enterMessageTextFieldPlaceholder = "Сообщение"
             static let cellIdentifier = "MessagesTableViewCell"
+            static let enterMessageButtonImage = "paperplane.fill"
         }
     }
 
