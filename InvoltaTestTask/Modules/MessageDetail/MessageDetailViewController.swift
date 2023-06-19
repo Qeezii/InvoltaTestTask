@@ -7,7 +7,14 @@
 
 import UIKit
 
+protocol MessageDetailViewControllerDelegate: AnyObject {
+    func deleteMessage(at index: Int)
+}
+
 final class MessageDetailViewController: UIViewController {
+
+    weak var delegate: MessageDetailViewControllerDelegate?
+    private var indexMessage: Int = 0
 
     private var messageTextLabel: UILabel = {
         let label = UILabel()
@@ -85,13 +92,15 @@ final class MessageDetailViewController: UIViewController {
         }
     }
 
-    func setMessage(message: MessageModel) {
+    func setMessage(message: MessageModel, indexMessage: Int) {
         messageTextLabel.text = message.text
         messageDateLabel.text = "Время отправки: \(message.date.formatted())"
         avatarImageView.image = message.image
+        self.indexMessage = indexMessage
     }
 
     @objc private func deleteButtonPressed() {
-        dismiss(animated: true)
+        delegate?.deleteMessage(at: indexMessage)
+        navigationController?.popViewController(animated: true)
     }
 }

@@ -14,6 +14,7 @@ final class MessagesViewController: UIViewController {
     private var messages: [MessageModel] = []
     private var isLoading: Bool = false
     private var failedLoadCounter: Int = 0
+    private var messagesRemovedCount: Int = 0
     private var enterMessageViewBottomConstraint: NSLayoutConstraint?
 
     // MARK: - UI Elements
@@ -63,6 +64,7 @@ final class MessagesViewController: UIViewController {
         textField.leftView = leftView
         textField.leftViewMode = .always
         textField.contentVerticalAlignment = .center
+        textField.returnKeyType = .send
         return textField
     }()
     private let enterMessageButton: UIButton = {
@@ -122,6 +124,7 @@ final class MessagesViewController: UIViewController {
         enterMessageView.heightAnchor.constraint(equalToConstant: 44).isActive = true
     }
     private func configureEnterMessageButton() {
+        enterMessageButton.addTarget(self, action: #selector(sendMessageButtonPressed), for: .touchUpInside)
         enterMessageView.addSubview(enterMessageButton)
         enterMessageButton.topAnchor.constraint(equalTo: enterMessageView.topAnchor).isActive = true
         enterMessageButton.trailingAnchor.constraint(equalTo: enterMessageView.trailingAnchor,
@@ -198,7 +201,7 @@ final class MessagesViewController: UIViewController {
         }
     }
     private func loadSuccess(messages: [String]) {
-        let auxOffset = offset
+        let auxOffset = offset - messagesRemovedCount
         var counter = offset
         messages.forEach( { self.messages.append(.init(text: $0, date: Date())) } )
         DispatchQueue.global(qos: .userInteractive).async {
@@ -220,9 +223,9 @@ final class MessagesViewController: UIViewController {
                 }
             }
         }
-        self.offset += messages.count
-        self.isLoading.toggle()
-        self.failedLoadCounter = 0
+        offset += messages.count
+        isLoading.toggle()
+        failedLoadCounter = 0
     }
     private func showSpinner(_ mode: Bool) {
         DispatchQueue.main.async {
@@ -232,6 +235,21 @@ final class MessagesViewController: UIViewController {
     private func updateConstraints() {
         UIView.animate(withDuration: 0.3) {
             self.view.layoutIfNeeded()
+        }
+    }
+    @objc private func sendMessageButtonPressed() {
+        guard let text = enterMessageTextField.text,
+              !text.isEmpty else { return }
+        NetworkManager.shared.loadImage { image in
+            self.messages.insert(.init(text: text, date: Date(), image: image), at: 0)
+            DispatchQueue.main.async {
+                UIView.transition(with: self.view,
+                                  duration: 0.2,
+                                  options: .transitionCrossDissolve) {
+                    self.enterMessageTextField.text = ""
+                    self.messagesTableView.reloadData()
+                }
+            }
         }
     }
     @objc private func hideKeyboard() {
@@ -271,7 +289,8 @@ extension MessagesViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let message = messages[indexPath.row]
         let messageDetailVC = MessageDetailViewController()
-        messageDetailVC.setMessage(message: message)
+        messageDetailVC.delegate = self
+        messageDetailVC.setMessage(message: message, indexMessage: indexPath.row)
         navigationController?.pushViewController(messageDetailVC, animated: true)
     }
 
@@ -283,6 +302,7 @@ extension MessagesViewController: UITableViewDelegate {
 // MARK: - UITextFieldDelegate
 extension MessagesViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        sendMessageButtonPressed()
         hideKeyboard()
         return true
     }
@@ -291,5 +311,19 @@ extension MessagesViewController: UITextFieldDelegate {
 extension MessagesViewController: UIGestureRecognizerDelegate {
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         true
+    }
+}
+// MARK: - MessageDetailViewControllerDelegate
+extension MessagesViewController: MessageDetailViewControllerDelegate {
+    func deleteMessage(at index: Int) {
+        messages.remove(at: index)
+        messagesRemovedCount += 1
+        DispatchQueue.main.async {
+            UIView.transition(with: self.view,
+                              duration: 0.2,
+                              options: .transitionCrossDissolve) {
+                self.messagesTableView.reloadData()
+            }
+        }
     }
 }
