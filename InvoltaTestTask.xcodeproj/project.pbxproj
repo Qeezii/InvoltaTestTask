@@ -17,6 +17,7 @@
 		9CA943602A3ADFBF00C39828 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CA9435F2A3ADFBF00C39828 /* NetworkManager.swift */; };
 		9CA943622A3AE19800C39828 /* NetworkError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CA943612A3AE19800C39828 /* NetworkError.swift */; };
 		9CA943642A3C9C8800C39828 /* MessagesTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CA943632A3C9C8800C39828 /* MessagesTableViewCell.swift */; };
+		9CA943692A404E6E00C39828 /* MessageDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CA943682A404E6E00C39828 /* MessageDetailViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +33,7 @@
 		9CA9435F2A3ADFBF00C39828 /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
 		9CA943612A3AE19800C39828 /* NetworkError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkError.swift; sourceTree = "<group>"; };
 		9CA943632A3C9C8800C39828 /* MessagesTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesTableViewCell.swift; sourceTree = "<group>"; };
+		9CA943682A404E6E00C39828 /* MessageDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageDetailViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,6 +96,7 @@
 			isa = PBXGroup;
 			children = (
 				9CA943652A3CB67000C39828 /* Chat */,
+				9CA943672A404E2700C39828 /* MessageDetail */,
 			);
 			path = Modules;
 			sourceTree = "<group>";
@@ -133,6 +136,14 @@
 				9CA943632A3C9C8800C39828 /* MessagesTableViewCell.swift */,
 			);
 			path = Chat;
+			sourceTree = "<group>";
+		};
+		9CA943672A404E2700C39828 /* MessageDetail */ = {
+			isa = PBXGroup;
+			children = (
+				9CA943682A404E6E00C39828 /* MessageDetailViewController.swift */,
+			);
+			path = MessageDetail;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -207,6 +218,7 @@
 			files = (
 				9CA943602A3ADFBF00C39828 /* NetworkManager.swift in Sources */,
 				9CA943642A3C9C8800C39828 /* MessagesTableViewCell.swift in Sources */,
+				9CA943692A404E6E00C39828 /* MessageDetailViewController.swift in Sources */,
 				9CA943622A3AE19800C39828 /* NetworkError.swift in Sources */,
 				9CA9435E2A3ADF2600C39828 /* MessageResponse.swift in Sources */,
 				9CA943442A3AD3DB00C39828 /* MessagesViewController.swift in Sources */,

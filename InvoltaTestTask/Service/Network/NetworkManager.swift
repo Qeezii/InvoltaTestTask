@@ -5,7 +5,7 @@
 //  Created by Alexey Poletaev on 15.06.2023.
 //
 
-import Foundation
+import UIKit
 
 final class NetworkManager {
 
@@ -40,5 +40,14 @@ final class NetworkManager {
                 completion(.failure(error))
             }
         }.resume()
+    }
+    func loadImage(completion: @escaping (UIImage?) -> ()) {
+        let url = URL(string: "https://i.pravatar.cc/100")!
+        DispatchQueue.global().async {
+            if let data = try? Data(contentsOf: url),
+                let image = UIImage(data: data) {
+                completion(image)
+            }
+        }
     }
 }

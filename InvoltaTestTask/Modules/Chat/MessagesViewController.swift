@@ -11,7 +11,8 @@ final class MessagesViewController: UIViewController {
 
     // MARK: - Properties
     private var offset: Int = 0
-    private var messages: [String] = []
+//    private var messages: [String] = []
+    private var messages: [MessageModel] = []
     private var isLoading: Bool = false
     private var failedLoadCounter: Int = 0
 
@@ -37,8 +38,11 @@ final class MessagesViewController: UIViewController {
     }()
     private let spinnerActivityIndicatorView: UIActivityIndicatorView = {
         let activityIndicator = UIActivityIndicatorView()
-        activityIndicator.style = .medium
+        activityIndicator.style = .large
         activityIndicator.startAnimating()
+        activityIndicator.isHidden = false
+        activityIndicator.hidesWhenStopped = true
+        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
         return activityIndicator
     }()
     private let enterMessageView: UIView = {
@@ -84,6 +88,9 @@ final class MessagesViewController: UIViewController {
         getMessage()
         configureUIElements()
     }
+    override func viewWillAppear(_ animated: Bool) {
+        navigationController?.navigationBar.isHidden = true
+    }
 
     // MARK: - Methods
     private func configureUIElements() {
@@ -93,6 +100,7 @@ final class MessagesViewController: UIViewController {
         configureEnterMessageButton()
         configureEnterMessageTextField()
         configureMessagesTableView()
+        configureSpinnerActivityIndicatorView()
     }
     private func configureMainView() {
         view.backgroundColor = .systemBackground
@@ -134,9 +142,12 @@ final class MessagesViewController: UIViewController {
         messagesTableView.delegate = self
         messagesTableView.register(MessagesTableViewCell.self,
                                    forCellReuseIdentifier: AppConstants.Strings.MessagesScreen.cellIdentifier)
-        messagesTableView.tableFooterView = spinnerActivityIndicatorView
+        let activityIndicator = UIActivityIndicatorView()
+        activityIndicator.style = .medium
+        activityIndicator.startAnimating()
+        activityIndicator.frame = CGRect(x: 0, y: 0, width: messagesTableView.bounds.width, height: 44)
+        messagesTableView.tableFooterView = activityIndicator
         messagesTableView.tableFooterView?.isHidden = true
-        spinnerActivityIndicatorView.frame = CGRect(x: 0, y: 0, width: messagesTableView.bounds.width, height: 44)
         messagesTableView.addGestureRecognizer(swipeDownRecognizer)
 
         view.addSubview(messagesTableView)
@@ -144,6 +155,11 @@ final class MessagesViewController: UIViewController {
         messagesTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         messagesTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         messagesTableView.bottomAnchor.constraint(equalTo: enterMessageView.topAnchor).isActive = true
+    }
+    private func configureSpinnerActivityIndicatorView() {
+        view.addSubview(spinnerActivityIndicatorView)
+        spinnerActivityIndicatorView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        spinnerActivityIndicatorView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
     }
     private func getMessage() {
         guard !isLoading,
@@ -156,8 +172,10 @@ final class MessagesViewController: UIViewController {
             guard let self else { return }
             switch result {
             case .success(let messageResponse):
-                showSpinner(false)
-                guard !messageResponse.result.isEmpty else { return }
+                guard !messageResponse.result.isEmpty else {
+                    showSpinner(false)
+                    return
+                }
                 loadSuccess(messages: messageResponse.result)
             case .failure(let failure):
                 print(failure.localizedDescription)
@@ -170,13 +188,31 @@ final class MessagesViewController: UIViewController {
         }
     }
     private func loadSuccess(messages: [String]) {
-        DispatchQueue.main.async {
-            self.messages += messages
-            self.offset += messages.count
-            self.isLoading.toggle()
-            self.failedLoadCounter = 0
-            self.messagesTableView.reloadData()
+        let auxOffset = offset
+        var counter = offset
+        messages.forEach( { self.messages.append(.init(text: $0, date: Date())) } )
+        DispatchQueue.global(qos: .userInteractive).async {
+            for index in auxOffset..<self.messages.count {
+                NetworkManager.shared.loadImage { image in
+                    self.messages[index].image = image
+                    counter += 1
+                    if counter == self.messages.count {
+                        DispatchQueue.main.async {
+                            UIView.transition(with: self.view,
+                                              duration: 0.2,
+                                              options: .transitionCrossDissolve) {
+                                self.spinnerActivityIndicatorView.stopAnimating()
+                                self.showSpinner(false)
+                                self.messagesTableView.reloadData()
+                            }
+                        }
+                    }
+                }
+            }
         }
+        self.offset += messages.count
+        self.isLoading.toggle()
+        self.failedLoadCounter = 0
     }
     private func showSpinner(_ mode: Bool) {
         DispatchQueue.main.async {
@@ -199,14 +235,18 @@ extension MessagesViewController: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: AppConstants.Strings.MessagesScreen.cellIdentifier,
                                                  for: indexPath)
         cell.transform = CGAffineTransform(scaleX: 1, y: -1)
-        (cell as? MessagesTableViewCell)?.setupMessageText(messages[indexPath.row])
+        (cell as? MessagesTableViewCell)?.setupMessageText(messages[indexPath.row].text)
+        (cell as? MessagesTableViewCell)?.setupAvatarImage(messages[indexPath.row].image)
         return cell
     }
 }
 // MARK: - UITableViewDelegate
 extension MessagesViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-
+        let message = messages[indexPath.row]
+        let messageDetailVC = MessageDetailViewController()
+        messageDetailVC.setMessage(message: message)
+        navigationController?.pushViewController(messageDetailVC, animated: true)
     }
 
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
