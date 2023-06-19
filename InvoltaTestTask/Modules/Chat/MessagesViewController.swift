@@ -11,10 +11,10 @@ final class MessagesViewController: UIViewController {
 
     // MARK: - Properties
     private var offset: Int = 0
-//    private var messages: [String] = []
     private var messages: [MessageModel] = []
     private var isLoading: Bool = false
     private var failedLoadCounter: Int = 0
+    private var enterMessageViewBottomConstraint: NSLayoutConstraint?
 
     // MARK: - UI Elements
     private let titleLabel: UILabel = {
@@ -87,6 +87,7 @@ final class MessagesViewController: UIViewController {
         super.viewDidLoad()
         getMessage()
         configureUIElements()
+        registeringKeyboardEventNotifications()
     }
     override func viewWillAppear(_ animated: Bool) {
         navigationController?.navigationBar.isHidden = true
@@ -116,7 +117,8 @@ final class MessagesViewController: UIViewController {
         view.addSubview(enterMessageView)
         enterMessageView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         enterMessageView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        enterMessageView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
+        enterMessageViewBottomConstraint = enterMessageView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        enterMessageViewBottomConstraint?.isActive = true
         enterMessageView.heightAnchor.constraint(equalToConstant: 44).isActive = true
     }
     private func configureEnterMessageButton() {
@@ -160,6 +162,14 @@ final class MessagesViewController: UIViewController {
         view.addSubview(spinnerActivityIndicatorView)
         spinnerActivityIndicatorView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         spinnerActivityIndicatorView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+    }
+    private func registeringKeyboardEventNotifications() {
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(keyboardWillShow(_:)),
+                                               name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(keyboardWillHide(_:)),
+                                               name: UIResponder.keyboardWillHideNotification, object: nil)
     }
     private func getMessage() {
         guard !isLoading,
@@ -219,9 +229,25 @@ final class MessagesViewController: UIViewController {
             self.messagesTableView.tableFooterView?.isHidden = mode ? false : true
         }
     }
+    private func updateConstraints() {
+        UIView.animate(withDuration: 0.3) {
+            self.view.layoutIfNeeded()
+        }
+    }
     @objc private func hideKeyboard() {
         enterMessageTextField.endEditing(true)
     }
+    @objc func keyboardWillShow(_ notification: Notification) {
+        guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+        let keyboardHeight = keyboardFrame.size.height
+        enterMessageViewBottomConstraint?.constant = -keyboardHeight
+        updateConstraints()
+    }
+    @objc func keyboardWillHide(_ notification: Notification) {
+        enterMessageViewBottomConstraint?.constant = 0
+        updateConstraints()
+    }
+
 }
 
 // MARK: - Extensions
