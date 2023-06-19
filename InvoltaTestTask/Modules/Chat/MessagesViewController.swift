@@ -15,6 +15,7 @@ final class MessagesViewController: UIViewController {
     private var isLoading: Bool = false
     private var failedLoadCounter: Int = 0
     private var messagesRemovedCount: Int = 0
+    private var messageAddedCount: Int = 0
     private var enterMessageViewBottomConstraint: NSLayoutConstraint?
 
     // MARK: - UI Elements
@@ -201,8 +202,8 @@ final class MessagesViewController: UIViewController {
         }
     }
     private func loadSuccess(messages: [String]) {
-        let auxOffset = offset - messagesRemovedCount
-        var counter = offset
+        let auxOffset = offset - messagesRemovedCount + messageAddedCount
+        var counter = offset + messageAddedCount
         messages.forEach( { self.messages.append(.init(text: $0, date: Date())) } )
         DispatchQueue.global(qos: .userInteractive).async {
             for index in auxOffset..<self.messages.count {
@@ -247,6 +248,7 @@ final class MessagesViewController: UIViewController {
                                   duration: 0.2,
                                   options: .transitionCrossDissolve) {
                     self.enterMessageTextField.text = ""
+                    self.messageAddedCount += 1
                     self.messagesTableView.reloadData()
                 }
             }
@@ -291,6 +293,7 @@ extension MessagesViewController: UITableViewDelegate {
         let messageDetailVC = MessageDetailViewController()
         messageDetailVC.delegate = self
         messageDetailVC.setMessage(message: message, indexMessage: indexPath.row)
+        hideKeyboard()
         navigationController?.pushViewController(messageDetailVC, animated: true)
     }
 
