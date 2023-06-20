@@ -307,13 +307,14 @@ final class MessagesViewController: UIViewController {
                                        avatarImage: image)
             self.messages.insert(message, at: 0)
             CoreDataManager.shared.addMessage(message)
+            self.messageAddedCount += 1
             DispatchQueue.main.async {
                 UIView.transition(with: self.view,
                                   duration: 0.2,
                                   options: .transitionCrossDissolve) {
                     self.enterMessageTextField.text = ""
-                    self.messageAddedCount += 1
-                    self.messagesTableView.reloadData()
+                    self.messagesTableView.insertRows(at: [IndexPath(row: 0, section: 0)],
+                                                      with: .automatic)
                 }
             }
         }
