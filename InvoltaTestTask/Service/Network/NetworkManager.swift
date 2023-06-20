@@ -13,10 +13,10 @@ final class NetworkManager {
 
     private init() {}
 
-    /// Fetches the data from the Github API
+    /// Fetches data from a remote server based on the provided offset.
     /// - Parameters:
-    ///   - offset: Message offset
-    ///   - completion: The completion handler to be called when the data fetching is complete. The handler takes a `Result` object as its parameter, which contains either the successfully decoded data or an error.
+    ///   - offset: The offset value used for pagination.
+    ///   - completion: A closure to be called with the result of the data fetch operation.
     func fetchData<T: Decodable>(offset: Int,
                                  completion: @escaping (Result<T, Error>) -> ()) {
 
@@ -41,8 +41,11 @@ final class NetworkManager {
             }
         }.resume()
     }
+
+    /// Loads an avatar image.
+    /// - Parameter completion: A closure to be called with the loaded image, or `nil` if the image loading failed.
     func loadImage(completion: @escaping (UIImage?) -> ()) {
-        let url = URL(string: "https://i.pravatar.cc/100")!
+        guard let url = API.getAvatarImage() else { return }
         DispatchQueue.global().async {
             if let data = try? Data(contentsOf: url),
                 let image = UIImage(data: data) {

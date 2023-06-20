@@ -120,28 +120,37 @@ final class MessagesViewController: UIViewController {
         view.addSubview(enterMessageView)
         enterMessageView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         enterMessageView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        enterMessageViewBottomConstraint = enterMessageView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        enterMessageViewBottomConstraint = enterMessageView.bottomAnchor.constraint(
+            equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         enterMessageViewBottomConstraint?.isActive = true
         enterMessageView.heightAnchor.constraint(equalToConstant: 44).isActive = true
     }
     private func configureEnterMessageButton() {
-        enterMessageButton.addTarget(self, action: #selector(sendMessageButtonPressed), for: .touchUpInside)
+        enterMessageButton.addTarget(self, action: #selector(sendMessageButtonPressed),
+                                     for: .touchUpInside)
         enterMessageView.addSubview(enterMessageButton)
         enterMessageButton.topAnchor.constraint(equalTo: enterMessageView.topAnchor).isActive = true
-        enterMessageButton.trailingAnchor.constraint(equalTo: enterMessageView.trailingAnchor,
-                                                     constant: AppConstants.Constraints.trailingSmall).isActive = true
+        enterMessageButton.trailingAnchor.constraint(
+            equalTo: enterMessageView.trailingAnchor,
+            constant: AppConstants.Constraints.trailingSmall).isActive = true
         enterMessageButton.bottomAnchor.constraint(equalTo: enterMessageView.bottomAnchor).isActive = true
         enterMessageButton.widthAnchor.constraint(equalToConstant: 24).isActive = true
     }
     private func configureEnterMessageTextField() {
         enterMessageTextField.delegate = self
         enterMessageView.addSubview(enterMessageTextField)
-        enterMessageTextField.topAnchor.constraint(equalTo: enterMessageView.topAnchor, constant: AppConstants.Constraints.topSpacingSmall).isActive = true
-        enterMessageTextField.leadingAnchor.constraint(equalTo: enterMessageView.leadingAnchor,
-                                                       constant: AppConstants.Constraints.leadingSmall).isActive = true
-        enterMessageTextField.trailingAnchor.constraint(equalTo: enterMessageButton.leadingAnchor,
-                                                        constant: AppConstants.Constraints.trailingSmall).isActive = true
-        enterMessageTextField.bottomAnchor.constraint(equalTo: enterMessageView.bottomAnchor, constant: AppConstants.Constraints.bottomSpacingSmall).isActive = true
+        enterMessageTextField.topAnchor.constraint(
+            equalTo: enterMessageView.topAnchor,
+            constant: AppConstants.Constraints.topSpacingSmall).isActive = true
+        enterMessageTextField.leadingAnchor.constraint(
+            equalTo: enterMessageView.leadingAnchor,
+            constant: AppConstants.Constraints.leadingSmall).isActive = true
+        enterMessageTextField.trailingAnchor.constraint(
+            equalTo: enterMessageButton.leadingAnchor,
+            constant: AppConstants.Constraints.trailingSmall).isActive = true
+        enterMessageTextField.bottomAnchor.constraint(
+            equalTo: enterMessageView.bottomAnchor,
+            constant: AppConstants.Constraints.bottomSpacingSmall).isActive = true
     }
     private func configureMessagesTableView() {
         messagesTableView.dataSource = self
@@ -190,7 +199,7 @@ final class MessagesViewController: UIViewController {
                     showSpinner(false)
                     return
                 }
-                loadSuccess(messages: messageResponse.result)
+                loadSuccess(messagesResponse: messageResponse.result)
             case .failure(let failure):
                 print(failure.localizedDescription)
                 failedLoadCounter += 1
@@ -201,36 +210,44 @@ final class MessagesViewController: UIViewController {
             }
         }
     }
-    private func loadSuccess(messages: [String]) {
-        if self.messages.isEmpty {
-            self.messages += CoreDataManager.shared.loadMessages()
-            messageAddedCount += self.messages.count
+    private func loadSuccess(messagesResponse: [String]) {
+        if messages.isEmpty {
+            messages += CoreDataManager.shared.loadMessages()
+            messageAddedCount += messages.count
         }
         let auxOffset = offset - messagesRemovedCount + messageAddedCount
-        var counter = offset + messageAddedCount
-        messages.forEach( { self.messages.append(.init(messageIdentifier: UUID(),
-                                                       text: $0,
-                                                       date: Date())) } )
-        DispatchQueue.global(qos: .userInteractive).async {
-            for index in auxOffset..<self.messages.count {
-                NetworkManager.shared.loadImage { image in
-                    self.messages[index].image = image
-                    counter += 1
-                    if counter == self.messages.count {
-                        DispatchQueue.main.async {
-                            UIView.transition(with: self.view,
-                                              duration: 0.2,
-                                              options: .transitionCrossDissolve) {
-                                self.spinnerActivityIndicatorView.stopAnimating()
-                                self.showSpinner(false)
-                                self.messagesTableView.reloadData()
-                            }
-                        }
+
+        messagesResponse.forEach( { messages.append(.init(messageIdentifier: UUID(),
+                                                          text: $0,
+                                                          date: Date())) } )
+
+        DispatchQueue.global(qos: .userInteractive).async { [weak self] in
+            guard let self = self else { return }
+            let group = DispatchGroup()
+
+            self.messages[auxOffset..<self.messages.count]
+                .enumerated()
+                .forEach { index, message in
+                    group.enter()
+                    NetworkManager.shared.loadImage { [weak self] image in
+                        guard let self = self else { return }
+                        self.messages[index + auxOffset].avatarImage = image
+                        group.leave()
                     }
+                }
+
+            group.notify(queue: .main) { [weak self] in
+                guard let self = self else { return }
+                UIView.transition(with: self.view,
+                                  duration: 0.2,
+                                  options: .transitionCrossDissolve) {
+                    self.spinnerActivityIndicatorView.stopAnimating()
+                    self.showSpinner(false)
+                    self.messagesTableView.reloadData()
                 }
             }
         }
-        offset += messages.count
+        offset += messagesResponse.count
         isLoading.toggle()
         failedLoadCounter = 0
     }
@@ -247,11 +264,12 @@ final class MessagesViewController: UIViewController {
     @objc private func sendMessageButtonPressed() {
         guard let text = enterMessageTextField.text,
               !text.isEmpty else { return }
+
         NetworkManager.shared.loadImage { image in
             let message = MessageModel(messageIdentifier: UUID(),
                                        text: text,
                                        date: Date(),
-                                       image: image)
+                                       avatarImage: image)
             self.messages.insert(message, at: 0)
             CoreDataManager.shared.addMessage(message)
             DispatchQueue.main.async {
@@ -292,8 +310,8 @@ extension MessagesViewController: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: AppConstants.Strings.MessagesScreen.cellIdentifier,
                                                  for: indexPath)
         cell.transform = CGAffineTransform(scaleX: 1, y: -1)
-        (cell as? MessagesTableViewCell)?.setupMessageText(messages[indexPath.row].text)
-        (cell as? MessagesTableViewCell)?.setupAvatarImage(messages[indexPath.row].image)
+        let message = messages[indexPath.row]
+        (cell as? MessagesTableViewCell)?.setupCell(text: message.text, image: message.avatarImage)
         return cell
     }
 }
@@ -306,6 +324,7 @@ extension MessagesViewController: UITableViewDelegate {
         messageDetailVC.setMessage(message: message, indexMessage: indexPath.row)
         hideKeyboard()
         navigationController?.pushViewController(messageDetailVC, animated: true)
+        tableView.deselectRow(at: indexPath, animated: true)
     }
 
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {

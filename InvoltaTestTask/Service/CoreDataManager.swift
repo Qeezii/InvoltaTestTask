@@ -31,15 +31,19 @@ final class CoreDataManager {
         }
     }
 
+    /// Adds a message to the Core Data store.
+    /// - Parameter message: The message to be added.
     func addMessage(_ message: MessageModel) {
         let messagesEntity = MessagesEntity(context: viewContext)
         messagesEntity.messageIdentifier = message.messageIdentifier
         messagesEntity.text = message.text
         messagesEntity.date = message.date
-        messagesEntity.avatarImageData = message.image?.pngData()
+        messagesEntity.avatarImageData = message.avatarImage?.pngData()
         saveContext()
     }
 
+    /// Removes a message from the Core Data store based on the message identifier.
+    /// - Parameter messageIdentifier: The identifier of the message to be removed.
     func removeMessage(_ messageIdentifier: UUID) {
         let fetchRequest: NSFetchRequest<MessagesEntity> = MessagesEntity.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "messageIdentifier == %@", messageIdentifier as CVarArg)
@@ -50,8 +54,8 @@ final class CoreDataManager {
         }
     }
 
-    /// Retrieves the list of favorite repositories from the managed object context.
-    /// - Returns: An array of `RepositoryEntity` objects representing the favorite repositories.
+    /// Loads and returns an array of all messages from the Core Data store.
+    /// - Returns: An array of `MessageModel` objects.
     func loadMessages() -> [MessageModel] {
         let fetchRequest: NSFetchRequest<MessagesEntity> = MessagesEntity.fetchRequest()
         let messages = try? viewContext.fetch(fetchRequest)
@@ -60,12 +64,22 @@ final class CoreDataManager {
             return []
         case .some(let messagesUnwrap):
             var messagesModel: [MessageModel] = []
+            var avatarImage = UIImage(systemName: "person.circle")
             messagesUnwrap
                 .sorted(by: { $0.date > $1.date })
                 .forEach { messageEntity in
-                let image: UIImage? = UIImage(data: messageEntity.avatarImageData!)
-                    messagesModel.append(.init(messageIdentifier: messageEntity.messageIdentifier, text: messageEntity.text, date: messageEntity.date, image: image))
-            }
+                    if let imageData = messageEntity.avatarImageData,
+                       let image = UIImage(data: imageData) {
+                        messagesModel.append(.init(messageIdentifier: messageEntity.messageIdentifier,
+                                                   text: messageEntity.text,
+                                                   date: messageEntity.date,
+                                                   avatarImage: image))
+                    } else {
+                        messagesModel.append(.init(messageIdentifier: messageEntity.messageIdentifier,
+                                                   text: messageEntity.text,
+                                                   date: messageEntity.date))
+                    }
+                }
             return messagesModel
         }
     }

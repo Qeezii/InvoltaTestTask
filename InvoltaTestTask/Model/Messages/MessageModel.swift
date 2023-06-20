@@ -11,5 +11,5 @@ struct MessageModel {
     let messageIdentifier: UUID
     let text: String
     let date: Date
-    var image: UIImage?
+    var avatarImage: UIImage?
 }

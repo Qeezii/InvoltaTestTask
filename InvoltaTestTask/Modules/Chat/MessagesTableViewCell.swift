@@ -9,6 +9,7 @@ import UIKit
 
 final class MessagesTableViewCell: UITableViewCell {
 
+    // MARK: - UI Elements
     private let messageLabel: UILabel = {
         let label = UILabel()
         label.numberOfLines = 0
@@ -25,16 +26,20 @@ final class MessagesTableViewCell: UITableViewCell {
         return imageView
     }()
 
+    // MARK: - Override funcs
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        configureAvatarImageView()
-        configureMessageLabel()
+        configureUIElements()
     }
-
     required init?(coder: NSCoder) {
         super.init(coder: coder)
     }
 
+    // MARK: - Methods
+    private func configureUIElements() {
+        configureAvatarImageView()
+        configureMessageLabel()
+    }
     private func configureMessageLabel() {
         addSubview(messageLabel)
         messageLabel.topAnchor.constraint(
@@ -52,21 +57,20 @@ final class MessagesTableViewCell: UITableViewCell {
     }
     private func configureAvatarImageView() {
         addSubview(avatarImageView)
-        avatarImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: AppConstants.Constraints.leadingMiddle).isActive = true
+        avatarImageView.leadingAnchor.constraint(
+            equalTo: leadingAnchor,
+            constant: AppConstants.Constraints.leadingMiddle).isActive = true
         avatarImageView.widthAnchor.constraint(equalToConstant: 35).isActive = true
         avatarImageView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
         avatarImageView.heightAnchor.constraint(equalToConstant: 35).isActive = true
     }
-
-    func setupMessageText(_ text: String) {
+    func setupCell(text: String, image: UIImage?) {
         messageLabel.text = text
-    }
-    func setupAvatarImage(_ image: UIImage?) {
         switch image {
         case .none:
-            avatarImageView.image = UIImage(systemName: "person.circle")
-        case .some(let wrapped):
-            avatarImageView.image = wrapped
+            avatarImageView.image = UIImage(systemName: AppConstants.Strings.MessageCell.avatarDefaultImage)
+        case .some(let imageUnwrap):
+            avatarImageView.image = imageUnwrap
         }
     }
 }
