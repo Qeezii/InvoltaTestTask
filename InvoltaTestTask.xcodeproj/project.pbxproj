@@ -18,6 +18,11 @@
 		9CA943622A3AE19800C39828 /* NetworkError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CA943612A3AE19800C39828 /* NetworkError.swift */; };
 		9CA943642A3C9C8800C39828 /* MessagesTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CA943632A3C9C8800C39828 /* MessagesTableViewCell.swift */; };
 		9CA943692A404E6E00C39828 /* MessageDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CA943682A404E6E00C39828 /* MessageDetailViewController.swift */; };
+		9CA943832A41614B00C39828 /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CA943802A41614B00C39828 /* CoreDataManager.swift */; };
+		9CA943872A41617700C39828 /* MessageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CA943862A41617700C39828 /* MessageModel.swift */; };
+		9CA9438B2A41619600C39828 /* MessagesCoreData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 9CA943892A41619600C39828 /* MessagesCoreData.xcdatamodeld */; };
+		9CA9438E2A41620600C39828 /* MessagesEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CA9438C2A41620600C39828 /* MessagesEntity+CoreDataClass.swift */; };
+		9CA9438F2A41620600C39828 /* MessagesEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CA9438D2A41620600C39828 /* MessagesEntity+CoreDataProperties.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +39,11 @@
 		9CA943612A3AE19800C39828 /* NetworkError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkError.swift; sourceTree = "<group>"; };
 		9CA943632A3C9C8800C39828 /* MessagesTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesTableViewCell.swift; sourceTree = "<group>"; };
 		9CA943682A404E6E00C39828 /* MessageDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageDetailViewController.swift; sourceTree = "<group>"; };
+		9CA943802A41614B00C39828 /* CoreDataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CoreDataManager.swift; path = ../CoreDataManager.swift; sourceTree = "<group>"; };
+		9CA943862A41617700C39828 /* MessageModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageModel.swift; sourceTree = "<group>"; };
+		9CA9438A2A41619600C39828 /* MessagesCoreData.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = MessagesCoreData.xcdatamodel; sourceTree = "<group>"; };
+		9CA9438C2A41620600C39828 /* MessagesEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MessagesEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
+		9CA9438D2A41620600C39828 /* MessagesEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MessagesEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,6 +97,7 @@
 		9CA943542A3AD68A00C39828 /* Service */ = {
 			isa = PBXGroup;
 			children = (
+				9CA943812A41614B00C39828 /* Memory */,
 				9CA943582A3AD8E600C39828 /* Network */,
 			);
 			path = Service;
@@ -104,7 +115,8 @@
 		9CA943562A3AD6A500C39828 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				9CA9435D2A3ADF2600C39828 /* MessageResponse.swift */,
+				9CA943852A41616A00C39828 /* Messages */,
+				9CA943882A41618000C39828 /* CoreData */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -144,6 +156,33 @@
 				9CA943682A404E6E00C39828 /* MessageDetailViewController.swift */,
 			);
 			path = MessageDetail;
+			sourceTree = "<group>";
+		};
+		9CA943812A41614B00C39828 /* Memory */ = {
+			isa = PBXGroup;
+			children = (
+				9CA943802A41614B00C39828 /* CoreDataManager.swift */,
+			);
+			path = Memory;
+			sourceTree = "<group>";
+		};
+		9CA943852A41616A00C39828 /* Messages */ = {
+			isa = PBXGroup;
+			children = (
+				9CA9435D2A3ADF2600C39828 /* MessageResponse.swift */,
+				9CA943862A41617700C39828 /* MessageModel.swift */,
+			);
+			path = Messages;
+			sourceTree = "<group>";
+		};
+		9CA943882A41618000C39828 /* CoreData */ = {
+			isa = PBXGroup;
+			children = (
+				9CA9438C2A41620600C39828 /* MessagesEntity+CoreDataClass.swift */,
+				9CA9438D2A41620600C39828 /* MessagesEntity+CoreDataProperties.swift */,
+				9CA943892A41619600C39828 /* MessagesCoreData.xcdatamodeld */,
+			);
+			path = CoreData;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -220,10 +259,15 @@
 				9CA943642A3C9C8800C39828 /* MessagesTableViewCell.swift in Sources */,
 				9CA943692A404E6E00C39828 /* MessageDetailViewController.swift in Sources */,
 				9CA943622A3AE19800C39828 /* NetworkError.swift in Sources */,
+				9CA9438F2A41620600C39828 /* MessagesEntity+CoreDataProperties.swift in Sources */,
+				9CA9438E2A41620600C39828 /* MessagesEntity+CoreDataClass.swift in Sources */,
 				9CA9435E2A3ADF2600C39828 /* MessageResponse.swift in Sources */,
 				9CA943442A3AD3DB00C39828 /* MessagesViewController.swift in Sources */,
 				9CA9435A2A3AD8F600C39828 /* API.swift in Sources */,
 				9CA943402A3AD3DB00C39828 /* AppDelegate.swift in Sources */,
+				9CA9438B2A41619600C39828 /* MessagesCoreData.xcdatamodeld in Sources */,
+				9CA943872A41617700C39828 /* MessageModel.swift in Sources */,
+				9CA943832A41614B00C39828 /* CoreDataManager.swift in Sources */,
 				9CA9435C2A3AD96A00C39828 /* AppConstants.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -438,6 +482,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		9CA943892A41619600C39828 /* MessagesCoreData.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				9CA9438A2A41619600C39828 /* MessagesCoreData.xcdatamodel */,
+			);
+			currentVersion = 9CA9438A2A41619600C39828 /* MessagesCoreData.xcdatamodel */;
+			path = MessagesCoreData.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 9CA943342A3AD3DB00C39828 /* Project object */;
 }

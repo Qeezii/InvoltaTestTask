@@ -202,9 +202,15 @@ final class MessagesViewController: UIViewController {
         }
     }
     private func loadSuccess(messages: [String]) {
+        if self.messages.isEmpty {
+            self.messages += CoreDataManager.shared.loadMessages()
+            messageAddedCount += self.messages.count
+        }
         let auxOffset = offset - messagesRemovedCount + messageAddedCount
         var counter = offset + messageAddedCount
-        messages.forEach( { self.messages.append(.init(text: $0, date: Date())) } )
+        messages.forEach( { self.messages.append(.init(messageIdentifier: UUID(),
+                                                       text: $0,
+                                                       date: Date())) } )
         DispatchQueue.global(qos: .userInteractive).async {
             for index in auxOffset..<self.messages.count {
                 NetworkManager.shared.loadImage { image in
@@ -242,7 +248,12 @@ final class MessagesViewController: UIViewController {
         guard let text = enterMessageTextField.text,
               !text.isEmpty else { return }
         NetworkManager.shared.loadImage { image in
-            self.messages.insert(.init(text: text, date: Date(), image: image), at: 0)
+            let message = MessageModel(messageIdentifier: UUID(),
+                                       text: text,
+                                       date: Date(),
+                                       image: image)
+            self.messages.insert(message, at: 0)
+            CoreDataManager.shared.addMessage(message)
             DispatchQueue.main.async {
                 UIView.transition(with: self.view,
                                   duration: 0.2,
@@ -318,8 +329,9 @@ extension MessagesViewController: UIGestureRecognizerDelegate {
 }
 // MARK: - MessageDetailViewControllerDelegate
 extension MessagesViewController: MessageDetailViewControllerDelegate {
-    func deleteMessage(at index: Int) {
+    func deleteMessage(at index: Int, messageIdentifier: UUID) {
         messages.remove(at: index)
+        CoreDataManager.shared.removeMessage(messageIdentifier)
         messagesRemovedCount += 1
         DispatchQueue.main.async {
             UIView.transition(with: self.view,

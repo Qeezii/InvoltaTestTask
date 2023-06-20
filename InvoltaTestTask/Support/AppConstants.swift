@@ -25,6 +25,10 @@ struct AppConstants {
             static let cellIdentifier = "MessagesTableViewCell"
             static let enterMessageButtonImage = "paperplane.fill"
         }
+
+        struct CoreData {
+            static let containerName = "MessagesCoreData"
+        }
     }
 
     struct Constraints {
