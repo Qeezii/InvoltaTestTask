@@ -10,18 +10,30 @@ import UIKit
 final class MessagesViewController: UIViewController {
 
     // MARK: - Properties
-    private var offset: Int = 0
+    private var offset: Int = .zero
     private var messages: [MessageModel] = []
     private var isLoading: Bool = false
-    private var messagesRemovedCount: Int = 0
-    private var messageAddedCount: Int = 0
-    private var enterMessageViewBottomConstraint: NSLayoutConstraint?
+    private var messagesRemovedCount: Int = .zero
+    private var messageAddedCount: Int = .zero
+    private var enterMessageTextFieldBottomConstraint: NSLayoutConstraint?
+    private var bottomInsetConstant: CGFloat {
+        let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+        let constant = scene?.windows.first?.safeAreaInsets.bottom ?? .zero
+        return constant == .zero ? AppConstants.Constraints.bottomSpacingSmall : -constant
+    }
 
     // MARK: - UI Elements
+    private let titleView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .secondarySystemFill
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = AppConstants.Strings.MessagesScreen.titleLabelText
         label.textColor = .label
+        label.font = .boldSystemFont(ofSize: 18)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -35,6 +47,7 @@ final class MessagesViewController: UIViewController {
         tableView.separatorStyle = .none
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.transform = CGAffineTransform(scaleX: 1, y: -1)
+        tableView.contentInset.top = 10
         return tableView
     }()
     private let spinnerActivityIndicatorView: UIActivityIndicatorView = {
@@ -88,6 +101,7 @@ final class MessagesViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         getMessage()
+        addUIElements()
         configureUIElements()
         registeringKeyboardEventNotifications()
     }
@@ -96,8 +110,18 @@ final class MessagesViewController: UIViewController {
     }
 
     // MARK: - Methods
+    private func addUIElements() {
+        view.addSubview(titleView)
+        titleView.addSubview(titleLabel)
+        view.addSubview(enterMessageView)
+        enterMessageView.addSubview(enterMessageTextField)
+        enterMessageView.addSubview(enterMessageButton)
+        view.addSubview(messagesTableView)
+        view.addSubview(spinnerActivityIndicatorView)
+    }
     private func configureUIElements() {
         configureMainView()
+        configureTitleView()
         configureTitleLabel()
         configureEnterMessageView()
         configureEnterMessageButton()
@@ -108,70 +132,73 @@ final class MessagesViewController: UIViewController {
     private func configureMainView() {
         view.backgroundColor = .systemBackground
     }
+    private func configureTitleView() {
+        titleView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        titleView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        titleView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+    }
     private func configureTitleLabel() {
-        view.addSubview(titleLabel)
         titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
-        titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        titleLabel.leadingAnchor.constraint(equalTo: titleView.leadingAnchor).isActive = true
+        titleLabel.trailingAnchor.constraint(equalTo: titleView.trailingAnchor).isActive = true
+        titleLabel.bottomAnchor.constraint(equalTo: titleView.bottomAnchor).isActive = true
         titleLabel.heightAnchor.constraint(equalToConstant: 44).isActive = true
     }
     private func configureEnterMessageView() {
-        view.addSubview(enterMessageView)
         enterMessageView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         enterMessageView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        enterMessageViewBottomConstraint = enterMessageView.bottomAnchor.constraint(
-            equalTo: view.safeAreaLayoutGuide.bottomAnchor)
-        enterMessageViewBottomConstraint?.isActive = true
-        enterMessageView.heightAnchor.constraint(equalToConstant: 44).isActive = true
+        enterMessageView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
     }
     private func configureEnterMessageButton() {
-        enterMessageButton.addTarget(self, action: #selector(sendMessageButtonPressed),
-                                     for: .touchUpInside)
-        enterMessageView.addSubview(enterMessageButton)
-        enterMessageButton.topAnchor.constraint(equalTo: enterMessageView.topAnchor).isActive = true
+        enterMessageButton.addTarget(self, action: #selector(sendMessageButtonPressed), for: .touchUpInside)
+
         enterMessageButton.trailingAnchor.constraint(
             equalTo: enterMessageView.trailingAnchor,
             constant: AppConstants.Constraints.trailingSmall).isActive = true
-        enterMessageButton.bottomAnchor.constraint(equalTo: enterMessageView.bottomAnchor).isActive = true
         enterMessageButton.widthAnchor.constraint(equalToConstant: 24).isActive = true
+        enterMessageButton.heightAnchor.constraint(equalToConstant: 24).isActive = true
+        enterMessageButton.bottomAnchor.constraint(equalTo: enterMessageTextField.bottomAnchor).isActive = true
     }
     private func configureEnterMessageTextField() {
         enterMessageTextField.delegate = self
-        enterMessageView.addSubview(enterMessageTextField)
+
         enterMessageTextField.topAnchor.constraint(
             equalTo: enterMessageView.topAnchor,
             constant: AppConstants.Constraints.topSpacingSmall).isActive = true
         enterMessageTextField.leadingAnchor.constraint(
             equalTo: enterMessageView.leadingAnchor,
-            constant: AppConstants.Constraints.leadingSmall).isActive = true
+            constant: AppConstants.Constraints.leadingMiddle).isActive = true
         enterMessageTextField.trailingAnchor.constraint(
             equalTo: enterMessageButton.leadingAnchor,
             constant: AppConstants.Constraints.trailingSmall).isActive = true
-        enterMessageTextField.bottomAnchor.constraint(
+        enterMessageTextFieldBottomConstraint = enterMessageTextField.bottomAnchor.constraint(
             equalTo: enterMessageView.bottomAnchor,
-            constant: AppConstants.Constraints.bottomSpacingSmall).isActive = true
+            constant: bottomInsetConstant)
+        enterMessageTextFieldBottomConstraint?.isActive = true
+        enterMessageTextField.heightAnchor.constraint(equalToConstant: 27).isActive = true
     }
     private func configureMessagesTableView() {
         messagesTableView.dataSource = self
         messagesTableView.delegate = self
         messagesTableView.register(MessagesTableViewCell.self,
                                    forCellReuseIdentifier: AppConstants.Strings.MessagesScreen.cellIdentifier)
+
         let activityIndicator = UIActivityIndicatorView()
         activityIndicator.style = .medium
         activityIndicator.startAnimating()
         activityIndicator.frame = CGRect(x: 0, y: 0, width: messagesTableView.bounds.width, height: 44)
+        activityIndicator.transform = CGAffineTransform(scaleX: 1, y: -1)
+
         messagesTableView.tableFooterView = activityIndicator
         messagesTableView.tableFooterView?.isHidden = true
         messagesTableView.addGestureRecognizer(swipeDownRecognizer)
 
-        view.addSubview(messagesTableView)
         messagesTableView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor).isActive = true
         messagesTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         messagesTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         messagesTableView.bottomAnchor.constraint(equalTo: enterMessageView.topAnchor).isActive = true
     }
     private func configureSpinnerActivityIndicatorView() {
-        view.addSubview(spinnerActivityIndicatorView)
         spinnerActivityIndicatorView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         spinnerActivityIndicatorView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
     }
@@ -217,7 +244,7 @@ final class MessagesViewController: UIViewController {
                                                           date: Date())) } )
 
         DispatchQueue.global(qos: .userInteractive).async { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             let group = DispatchGroup()
 
             self.messages[auxOffset..<self.messages.count]
@@ -232,7 +259,7 @@ final class MessagesViewController: UIViewController {
                 }
 
             group.notify(queue: .main) { [weak self] in
-                guard let self = self else { return }
+                guard let self else { return }
                 UIView.transition(with: self.view,
                                   duration: 0.2,
                                   options: .transitionCrossDissolve) {
@@ -258,8 +285,12 @@ final class MessagesViewController: UIViewController {
     private func showErrorAlert(message: String) {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
-            let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "Try again", style: .default, handler: { [weak self] _ in
+            let alert = UIAlertController(title: AppConstants.Strings.Alert.alertErrorMessage,
+                                          message: message,
+                                          preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: AppConstants.Strings.Alert.alertErrorButton,
+                                          style: .default,
+                                          handler: { [weak self] _ in
                 self?.getMessage()
             }))
             self.present(alert, animated: true, completion: nil)
@@ -293,14 +324,13 @@ final class MessagesViewController: UIViewController {
     @objc func keyboardWillShow(_ notification: Notification) {
         guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
         let keyboardHeight = keyboardFrame.size.height
-        enterMessageViewBottomConstraint?.constant = -keyboardHeight
+        enterMessageTextFieldBottomConstraint?.constant = -keyboardHeight + AppConstants.Constraints.bottomSpacingSmall
         updateConstraints()
     }
     @objc func keyboardWillHide(_ notification: Notification) {
-        enterMessageViewBottomConstraint?.constant = 0
+        enterMessageTextFieldBottomConstraint?.constant = bottomInsetConstant
         updateConstraints()
     }
-
 }
 
 // MARK: - Extensions

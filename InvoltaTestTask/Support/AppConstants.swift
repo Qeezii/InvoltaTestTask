@@ -42,6 +42,10 @@ struct AppConstants {
         struct CoreData {
             static let containerName = "MessagesCoreData"
         }
+        struct Alert {
+            static let alertErrorMessage = "Error"
+            static let alertErrorButton = "Try again"
+        }
     }
 
     struct Constraints {

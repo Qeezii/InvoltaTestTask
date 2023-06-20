@@ -15,7 +15,7 @@ final class MessageDetailViewController: UIViewController {
 
     // MARK: - Properties
     weak var delegate: MessageDetailViewControllerDelegate?
-    private var indexMessage: Int = 0
+    private var indexMessage: Int = .zero
     private var messageIdentifier: UUID = UUID()
 
     // MARK: - UI Elements
@@ -24,16 +24,16 @@ final class MessageDetailViewController: UIViewController {
         label.text = AppConstants.Strings.DetailMessageScreen.textLabelDefaultText
         label.textAlignment = .center
         label.textColor = .label
-        label.alpha = 0.0
-        label.numberOfLines = 0
+        label.alpha = .zero
+        label.numberOfLines = .zero
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     private let avatarImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
-        imageView.alpha = 0.0
-        imageView.layer.cornerRadius = 25
+        imageView.alpha = .zero
+        imageView.layer.cornerRadius = 50
         imageView.clipsToBounds = true
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
@@ -41,7 +41,7 @@ final class MessageDetailViewController: UIViewController {
     private var messageDateLabel: UILabel = {
         let label = UILabel()
         label.text = AppConstants.Strings.DetailMessageScreen.dateLabelDefaultText
-        label.alpha = 0.0
+        label.alpha = .zero
         label.textColor = .label
         label.textAlignment = .center
         label.font = .systemFont(ofSize: 13)
@@ -53,7 +53,7 @@ final class MessageDetailViewController: UIViewController {
         button.setTitle(AppConstants.Strings.DetailMessageScreen.deleteButtonDefaultText,
                         for: .normal)
         button.setTitleColor(.red, for: .normal)
-        button.alpha = 0.0
+        button.alpha = .zero
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -61,11 +61,11 @@ final class MessageDetailViewController: UIViewController {
     // MARK: - Override funcs
     override func viewDidLoad() {
         super.viewDidLoad()
+        addUIElemets()
         configureUIElements()
     }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-
         UIView.animate(withDuration: 1.0) {
             self.messageTextLabel.alpha = 1.0
             self.messageDateLabel.alpha = 1.0
@@ -75,6 +75,12 @@ final class MessageDetailViewController: UIViewController {
     }
 
     // MARK: - Methods
+    private func addUIElemets() {
+        view.addSubview(messageTextLabel)
+        view.addSubview(avatarImageView)
+        view.addSubview(messageDateLabel)
+        view.addSubview(deleteButton)
+    }
     private func configureUIElements() {
         configureMainView()
         configureMessageTextLabel()
@@ -87,22 +93,19 @@ final class MessageDetailViewController: UIViewController {
         view.backgroundColor = .systemBackground
     }
     private func configureMessageTextLabel() {
-        view.addSubview(messageTextLabel)
         messageTextLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         messageTextLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         messageTextLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
     }
     private func configureAvatarImageView() {
-        view.addSubview(avatarImageView)
         avatarImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         avatarImageView.bottomAnchor.constraint(
             equalTo: messageTextLabel.topAnchor,
             constant: AppConstants.Constraints.bottomSpacingMiddle).isActive = true
-        avatarImageView.widthAnchor.constraint(equalToConstant: 50).isActive = true
-        avatarImageView.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        avatarImageView.widthAnchor.constraint(equalToConstant: 100).isActive = true
+        avatarImageView.heightAnchor.constraint(equalToConstant: 100).isActive = true
     }
     private func configureMessageDateLabel() {
-        view.addSubview(messageDateLabel)
         messageDateLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         messageDateLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         messageDateLabel.topAnchor.constraint(
@@ -111,7 +114,7 @@ final class MessageDetailViewController: UIViewController {
     }
     private func configureDeleteButton() {
         deleteButton.addTarget(self, action: #selector(deleteButtonPressed), for: .touchUpInside)
-        view.addSubview(deleteButton)
+
         deleteButton.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         deleteButton.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         deleteButton.topAnchor.constraint(

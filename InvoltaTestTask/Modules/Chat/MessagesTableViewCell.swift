@@ -12,7 +12,7 @@ final class MessagesTableViewCell: UITableViewCell {
     // MARK: - UI Elements
     private let messageLabel: UILabel = {
         let label = UILabel()
-        label.numberOfLines = 0
+        label.numberOfLines = .zero
         label.textColor = .label
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -29,6 +29,7 @@ final class MessagesTableViewCell: UITableViewCell {
     // MARK: - Override funcs
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        addUIElements()
         configureUIElements()
     }
     required init?(coder: NSCoder) {
@@ -36,12 +37,15 @@ final class MessagesTableViewCell: UITableViewCell {
     }
 
     // MARK: - Methods
+    private func addUIElements() {
+        addSubview(messageLabel)
+        addSubview(avatarImageView)
+    }
     private func configureUIElements() {
         configureAvatarImageView()
         configureMessageLabel()
     }
     private func configureMessageLabel() {
-        addSubview(messageLabel)
         messageLabel.topAnchor.constraint(
             equalTo: topAnchor,
             constant: AppConstants.Constraints.topSpacingSmall).isActive = true
@@ -56,7 +60,6 @@ final class MessagesTableViewCell: UITableViewCell {
             constant: AppConstants.Constraints.bottomSpacingSmall).isActive = true
     }
     private func configureAvatarImageView() {
-        addSubview(avatarImageView)
         avatarImageView.leadingAnchor.constraint(
             equalTo: leadingAnchor,
             constant: AppConstants.Constraints.leadingMiddle).isActive = true

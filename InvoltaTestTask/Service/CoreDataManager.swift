@@ -64,7 +64,6 @@ final class CoreDataManager {
             return []
         case .some(let messagesUnwrap):
             var messagesModel: [MessageModel] = []
-            var avatarImage = UIImage(systemName: "person.circle")
             messagesUnwrap
                 .sorted(by: { $0.date > $1.date })
                 .forEach { messageEntity in
