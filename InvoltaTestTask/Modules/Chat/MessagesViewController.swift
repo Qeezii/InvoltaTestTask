@@ -13,7 +13,6 @@ final class MessagesViewController: UIViewController {
     private var offset: Int = 0
     private var messages: [MessageModel] = []
     private var isLoading: Bool = false
-    private var failedLoadCounter: Int = 0
     private var messagesRemovedCount: Int = 0
     private var messageAddedCount: Int = 0
     private var enterMessageViewBottomConstraint: NSLayoutConstraint?
@@ -185,8 +184,7 @@ final class MessagesViewController: UIViewController {
                                                name: UIResponder.keyboardWillHideNotification, object: nil)
     }
     private func getMessage() {
-        guard !isLoading,
-              failedLoadCounter < 3 else { return }
+        guard !isLoading else { return }
         if !messages.isEmpty {
             showSpinner(true)
         }
@@ -201,12 +199,9 @@ final class MessagesViewController: UIViewController {
                 }
                 loadSuccess(messagesResponse: messageResponse.result)
             case .failure(let failure):
-                print(failure.localizedDescription)
-                failedLoadCounter += 1
                 isLoading.toggle()
                 showSpinner(false)
-                guard failedLoadCounter < 3 else { return }
-                getMessage()
+                showErrorAlert(message: failure.localizedDescription)
             }
         }
     }
@@ -249,7 +244,6 @@ final class MessagesViewController: UIViewController {
         }
         offset += messagesResponse.count
         isLoading.toggle()
-        failedLoadCounter = 0
     }
     private func showSpinner(_ mode: Bool) {
         DispatchQueue.main.async {
@@ -259,6 +253,16 @@ final class MessagesViewController: UIViewController {
     private func updateConstraints() {
         UIView.animate(withDuration: 0.3) {
             self.view.layoutIfNeeded()
+        }
+    }
+    private func showErrorAlert(message: String) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Try again", style: .default, handler: { [weak self] _ in
+                self?.getMessage()
+            }))
+            self.present(alert, animated: true, completion: nil)
         }
     }
     @objc private func sendMessageButtonPressed() {
